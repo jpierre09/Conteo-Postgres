@@ -267,7 +267,35 @@ def realTime():
         fecha1 = datetime.utcnow()
         sucess, img = cap.read()
         if img is None:
-            print(up_list)
+            print(down_list)
+
+            ### When video finish send data to DB
+            try:
+                print('Starting conection to DB...')
+                connection = psycopg2.connect(
+                    host='localhost',
+                    user='postgres',
+                    password='siata',
+                    database='siata_vi'
+                )
+                print('a la mitad')
+                cursor=connection.cursor()
+                sql= 'INSERT INTO conteo_vehicular values (%s, %s, %s, %s)'
+                #dy = 'in'+ up_list
+                cursor.execute(sql, down_list)
+                connection.commit()
+                print('a la mitad 2')
+                connection.close
+                print('Conection completed !')
+            except Exception as ex:
+                print('falló el almacenamiento')
+
+                ### Seria buena idea hacer un bucle acá por si falla, que vuelva e intente almacenar
+            #finally:
+            #    connection.close()
+            #    print('conexión a DB finalizada y saliendo del programa')
+            #    break
+
             print('Proceso terminado')
             break
         img = cv2.resize(img,(0,0),None,0.5,0.5)
@@ -316,48 +344,34 @@ def realTime():
         #print(pr + up_list)
         #print(pr1 + down_list) 
 
-        #try:            
+ 
+        
+        ####### PRUEBAS PARA ALMACENAMIENTO EN DB
+        #try:
+            #connection = psycopg2.connect(
+            #    host='localhost',
+            #    user='postgres',
+            #    password='siata',
+            #    database='siata_vi'
+            #)  
+
         #    with open(datadir + '/' + 'cvgir_'+ str(resta) + '.csv', 'w') as data:
         #        cwriter = csv.writer(data)
-        #        #dd = [now.strftime('%y/%m/%d %H:%M')]
+                #dd = [now.strftime('%y/%m/%d %H:%M')]
         #        cwriter.writerow(['Direction','car', 'bike', 'bus', 'truck'])
-        #        #up_list.insert(0, 'out')
-        #        #down_list.insert(0, 'in')
+                #up_list.insert(0, 'out')
+                #down_list.insert(0, 'in')
         #        dir1 = dir_out + up_list 
         #        dir2 = dir_in + down_list
         #        cwriter.writerow(dir1)
         #        cwriter.writerow(dir2)
         #    data.close()
-        #except:
-#       #     print('hola')
-        #    break
-
-        ####### PRUEBAS PARA ALMACENAMIENTO EN DB
-        try:
-            connection = psycopg2.connect(
-                host='localhost',
-                user='postgres',
-                password='siata',
-                database='siata_vi'
-            )  
-
-            #with open(datadir + '/' + 'cvgir_'+ str(resta) + '.csv', 'w') as data:
-            #    cwriter = csv.writer(data)
-                #dd = [now.strftime('%y/%m/%d %H:%M')]
-            #    cwriter.writerow(['Direction','car', 'bike', 'bus', 'truck'])
-                #up_list.insert(0, 'out')
-                #down_list.insert(0, 'in')
-            #    dir1 = dir_out + up_list 
-            #    dir2 = dir_in + down_list
-            #    cwriter.writerow(dir1)
-            #    cwriter.writerow(dir2)
-            #data.close()
-            cursor=connection.cursor()
-            sql= 'INSERT INTO conteo_vehicular values ( %s, %s, %s, %s)'
-            dy = 'in'+up_list
-            cursor.execute(sql, dy)
-            connection.commit()
-            connection.close
+            #cursor=connection.cursor()
+            #sql= 'INSERT INTO conteo_vehicular values ( %s, %s, %s, %s)'
+            #dy = 'in'+up_list
+            #cursor.execute(sql, dy)
+            #connection.commit()
+            #connection.close
             #cursor.execute("SELECT into conteo_vehicular values('out',34,45,56,76,'')")
             #cursor.execute("SELECT version()")
             #row=cursor.fetchone()
@@ -366,13 +380,13 @@ def realTime():
             #rows=cursor.fetchall()
             #for row in rows:
             #    print(row)
-            print('Conexion exitosa a DB')
-        except Exception as ex:
-            print('falló el almacenamiento')
-        finally:
-            connection.close()
-            print('conexión a DB finalizada')
-            #break
+            #print('Conexion exitosa a DB')
+        #except Exception as ex:
+        #    print('falló el almacenamiento')
+        #finally:
+            #connection.close()
+            #print('conexión a DB finalizada')
+        #    break
 
         ###### END DB STORAGE    
 
